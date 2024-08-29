@@ -10,7 +10,7 @@
 	<h3>Example of an Extension Method</h3>
 
 	
-```charp
+```csharp
 using System;
 
 // Use the Extension Method
@@ -20,24 +20,27 @@ public class Program
 	{
 		string sentence = "This is an example sentence with five words.";
 
-        // Using the extension method as if it were an instance method
-        int wordCount = sentence.WordCount();
-
-        Console.WriteLine($"The sentence has {wordCount} words.");
-		
-				int number = 42;
-
-        // Using the extension method to check if the number is even
-        bool isEven = number.IsEven();
-
-        Console.WriteLine($"{number} is even: {isEven}");
-
-        int anotherNumber = 33;
-
-        // Using the extension method on another number
-        bool isAnotherEven = anotherNumber.IsEven();
-
-        Console.WriteLine($"{anotherNumber} is even: {isAnotherEven}");
+	        // Using the extension method as if it were an instance method
+	        int wordCount = sentence.WordCount();
+	
+	        Console.WriteLine($"The sentence has {wordCount} words.");
+			
+					int number = 42;
+	
+	        // Using the extension method to check if the number is even
+	        bool isEven = number.IsEven();
+	
+	        Console.WriteLine($"{number} is even: {isEven}");
+	
+	        int anotherNumber = 33;
+	
+	        // Using the extension method on another number
+	        bool isAnotherEven = anotherNumber.IsEven();
+	
+	        Console.WriteLine($"{anotherNumber} is even: {isAnotherEven}");
+		Console.WriteLine(" ");
+		// here is a complex example of filtering a class list with using linq filter like where or find
+		ComplexExtensionMethodClass.Run();
 	}
 }
 
@@ -61,6 +64,65 @@ public static class StringExtensions
 	{
 		return number % 2 == 0;
 	}
+}
+public class ComplexExtensionMethodClass
+{
+    public static void Run()
+    {
+        var employees = new List<Employee>
+        {
+            new Employee { EmployeeId = 1, EmployeeName = "John Doe", EmployeeMobile = "1234567890" },
+            new Employee { EmployeeId = 2, EmployeeName = "Jane Smith", EmployeeMobile = "0987654321" },
+            new Employee { EmployeeId = 3, EmployeeName = "Alice Johnson", EmployeeMobile = "5555555555" }
+        };
+
+        // Find employee by name
+        var employeeByName = employees.FindByProperty("EmployeeName", "Jane Smith");
+        Console.WriteLine($"Found Employee: {employeeByName?.EmployeeName}, Mobile: {employeeByName?.EmployeeMobile}");
+
+        // Find employee by mobile
+        var employeeByMobile = employees.FindByProperty("EmployeeMobile", "5555555555");
+        Console.WriteLine($"Found Employee: {employeeByMobile?.EmployeeName}, Mobile: {employeeByMobile?.EmployeeMobile}");
+
+        // Example with a different class
+        var products = new List<Product>
+        {
+            new Product { ProductId = 1, ProductName = "Laptop", Price = 1000 },
+            new Product { ProductId = 2, ProductName = "Smartphone", Price = 500 }
+        };
+
+        var productByName = products.FindByProperty("ProductName", "Laptop");
+        Console.WriteLine($"Found Product: {productByName?.ProductName}, Price: {productByName?.Price}");
+    }
+}
+public static class ListExtensions
+{
+    public static T FindByProperty<T>(this List<T> list, string propertyName, object value)
+    {
+        return list.FirstOrDefault(item =>
+        {
+            var prop = typeof(T).GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            if (prop == null)
+            {
+                throw new ArgumentException($"Property '{propertyName}' not found on type '{typeof(T)}'");
+            }
+            var propValue = prop.GetValue(item);
+            return propValue != null && propValue.Equals(value);
+        });
+    }
+}
+public class Employee
+{
+    public int EmployeeId { get; set; }
+    public string EmployeeName { get; set; }
+    public string EmployeeMobile { get; set; }
+}
+
+public class Product
+{
+    public int ProductId { get; set; }
+    public string ProductName { get; set; }
+    public double Price { get; set; }
 }
 ```
 <h3>Explanation:</h3>
